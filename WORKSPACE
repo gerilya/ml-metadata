@@ -1,7 +1,9 @@
 workspace(name = "ml_metadata")
 
+load("//ml_metadata:repo.bzl", "mlmd_http_archive", "clean_dep")
 load("//ml_metadata:repo.bzl", "clean_dep")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "postgresql",
@@ -14,55 +16,120 @@ http_archive(
     ],
 )
 
-#Install bazel platform version 0.0.6
+# #Install bazel platform version 0.0.6
+# http_archive(
+#     name = "platforms",
+#     urls = [
+#         "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+#         "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+#     ],
+#     sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+# )
+PLATFORMS_COMMIT = "d9296d956de6e7b3ae83ecc37a5970e5eebeee32"
 http_archive(
-    name = "platforms",
+    name="platforms",
+    sha256 = "01db13196adfb8468db77d7e42b1828dd7242112cca55b4df65df7cf7c91ec39",
+    strip_prefix = "platforms-%s" % PLATFORMS_COMMIT,
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
-        "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/platforms/archive/%s.tar.gz" % PLATFORMS_COMMIT,
+        "https://github.com/bazelbuild/PLATFORMS/archive/%s.tar.gz" % PLATFORMS_COMMIT,
     ],
-    sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
 )
 
-# Install version 0.9.0 of rules_foreign_cc, as default version causes an
-# invalid escape sequence error to be raised, which can't be avoided with
-# the --incompatible_restrict_string_escapes=false flag (flag was removed in
-# Bazel 5.0).
-RULES_FOREIGN_CC_VERSION = "0.9.0"
+# # Install version 0.9.0 of rules_foreign_cc, as default version causes an
+# # invalid escape sequence error to be raised, which can't be avoided with
+# # the --incompatible_restrict_string_escapes=false flag (flag was removed in
+# # Bazel 5.0).
+# RULES_FOREIGN_CC_VERSION = "0.9.0"
+# http_archive(
+#     name = "rules_foreign_cc",
+#     sha256 = "2a4d07cd64b0719b39a7c12218a3e507672b82a97b98c6a89d38565894cf7c51",
+#     strip_prefix = "rules_foreign_cc-%s" % RULES_FOREIGN_CC_VERSION,
+#     url = "https://github.com/bazelbuild/rules_foreign_cc/archive/refs/tags/%s.tar.gz" % RULES_FOREIGN_CC_VERSION,
+#     patch_tool = "patch",
+#     patches = ["//ml_metadata/third_party:rules_foreign_cc.patch",],
+# )
+
+# https://github.com/bazelbuild/rules_foreign_cc/issues/1051
+RULES_FOREIGN_CC_VERSION = "0.8.0"
 http_archive(
     name = "rules_foreign_cc",
-    sha256 = "2a4d07cd64b0719b39a7c12218a3e507672b82a97b98c6a89d38565894cf7c51",
     strip_prefix = "rules_foreign_cc-%s" % RULES_FOREIGN_CC_VERSION,
     url = "https://github.com/bazelbuild/rules_foreign_cc/archive/refs/tags/%s.tar.gz" % RULES_FOREIGN_CC_VERSION,
-    patch_tool = "patch",
-    patches = ["//ml_metadata/third_party:rules_foreign_cc.patch",],
 )
-
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 rules_foreign_cc_dependencies()
 
+# RULES_FOREIGN_CC_COMMIT = "a7f9e8b38cc2c8a7c66862dd6a4c8848e9829a02" # 23/09/2022
+# http_archive(
+#     name="rules_foreign_cc",
+#     sha256 = "ce3121834693d76308f50fa62c548c2710f900d807beb11d97c25739b6995f58",
+#     strip_prefix = "rules_foreign_cc-%s" % RULES_FOREIGN_CC_COMMIT,
+#     urls = [
+#         "https://mirror.bazel.build/github.com/bazelbuild/rules_foreign_cc/archive/%s.tar.gz" % RULES_FOREIGN_CC_COMMIT,
+#         "https://github.com/bazelbuild/rules_foreign_cc/archive/%s.tar.gz" % RULES_FOREIGN_CC_COMMIT,
+#     ],
+# )
+
+# # lts_20220623.1
+# ABSL_COMMIT = "8c0b94e793a66495e0b1f34a5eb26bd7dc672db0" # https://github.com/abseil/abseil-cpp/archive/fb3621f4f897824c0dbe0615fa94543df6192f30.tar.gz
+# http_archive(
+#     name = "com_google_absl",
+#     urls = [
+#         "https://mirror.bazel.build/github.com/abseil/abseil-cpp/archive/%s.tar.gz" % ABSL_COMMIT,
+#         "https://github.com/abseil/abseil-cpp/archive/%s.tar.gz" % ABSL_COMMIT,
+#     ],
+#     strip_prefix = "abseil-cpp-%s" % ABSL_COMMIT,
+#     sha256 = "a6be76f59c474a215f2df5116b312257462e97f2e38b2bfa6df8b6a55710b058",
+# )
+
+ABSL_COMMIT = "fb3621f4f897824c0dbe0615fa94543df6192f30" # https://github.com/abseil/abseil-cpp/archive/fb3621f4f897824c0dbe0615fa94543df6192f30.tar.gz
 http_archive(
     name = "com_google_absl",
-    urls = ["https://github.com/abseil/abseil-cpp/archive/940c06c25d2953f44310b68eb8aab6114dba11fb.zip"],
-    strip_prefix = "abseil-cpp-940c06c25d2953f44310b68eb8aab6114dba11fb",
-    sha256 = "0e800799aa64d0b4d354f3ff317bbd5fbf42f3a522ab0456bb749fc8d3b67415",
-)
-
-http_archive(
-    name = "boringssl",
-    sha256 = "1188e29000013ed6517168600fc35a010d58c5d321846d6a6dfee74e4c788b45",
-    strip_prefix = "boringssl-7f634429a04abc48e2eb041c81c5235816c96514",
     urls = [
-        "https://github.com/google/boringssl/archive/7f634429a04abc48e2eb041c81c5235816c96514.tar.gz",
+        "https://mirror.bazel.build/github.com/abseil/abseil-cpp/archive/%s.tar.gz" % ABSL_COMMIT,
+        "https://github.com/abseil/abseil-cpp/archive/%s.tar.gz" % ABSL_COMMIT,
     ],
+    strip_prefix = "abseil-cpp-%s" % ABSL_COMMIT,
 )
 
-http_archive(
+
+# http_archive(
+#     name = "boringssl",
+#     sha256 = "1188e29000013ed6517168600fc35a010d58c5d321846d6a6dfee74e4c788b45",
+#     strip_prefix = "boringssl-7f634429a04abc48e2eb041c81c5235816c96514",
+#     urls = [
+#         "https://github.com/google/boringssl/archive/7f634429a04abc48e2eb041c81c5235816c96514.tar.gz",
+#     ],
+# )
+### BORINGSSL_COMMIT = "adde128bd706c6caf26dd595e631871b09f40bf6"
+# BORINGSSL_COMMIT = "d24a38200fef19150eef00cad35b138936c08767" # 2023-09-27
+# mlmd_http_archive(
+#     name = "boringssl",
+#     ### sha256 = "7fc7632ce455575025be2cac610a23377753b01a4932d94a452cf831a5b32e9e",
+#     sha256 = "f00c18c6ceef32b50afb012b1a5c4faf38a470fb8e5c2deb9dbd45df1f0d7909",
+#     strip_prefix = "boringssl-%s" % BORINGSSL_COMMIT,
+#     system_build_file = clean_dep("//ml_metadata/third_party/systemlibs:boringssl.BUILD"),
+#     urls = [
+#         "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/boringssl/archive/%s.tar.gz" % BORINGSSL_COMMIT,
+#         "https://github.com/google/boringssl/archive/%s.tar.gz" % BORINGSSL_COMMIT,
+#     ],
+# )
+
+git_repository(
+    name = "boringssl",
+    commit = "1a6869053b340e3fcc4a57ae271f7584199dc95e",
+    remote = "https://boringssl.googlesource.com/boringssl",
+)
+
+mlmd_http_archive(
     name = "org_sqlite",
     build_file = clean_dep("//ml_metadata/third_party:sqlite.BUILD"),
     sha256 = "87775784f8b22d0d0f1d7811870d39feaa7896319c7c20b849a4181c5a50609b",
     strip_prefix = "sqlite-amalgamation-3390200",
+    system_build_file = clean_dep("//ml_metadata/third_party/systemlibs:sqlite.BUILD"),
     urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/www.sqlite.org/2022/sqlite-amalgamation-3390200.zip",
         "https://www.sqlite.org/2022/sqlite-amalgamation-3390200.zip",
     ],
 )
@@ -88,10 +155,10 @@ http_archive(
 
 http_archive(
     name = "bazel_skylib",
-    sha256 = "97e70364e9249702246c0e9444bccdc4b847bed1eb03c5a3ece4f83dfe6abc44",
+    sha256 = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.0.2/bazel-skylib-1.0.2.tar.gz",
-        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.2/bazel-skylib-1.0.2.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",
     ],
 )
 
@@ -99,33 +166,33 @@ http_archive(
 http_archive(
     name = "six_archive",
     urls = [
-        "http://mirror.bazel.build/pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
-        "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
+        "http://mirror.bazel.build/pypi.python.org/packages/source/s/six/six-1.16.0.tar.gz",
+        "https://pypi.python.org/packages/source/s/six/six-1.16.0.tar.gz",
     ],
-    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-    strip_prefix = "six-1.10.0",
+    sha256 = "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
+    strip_prefix = "six-1.16.0",
     build_file = "//ml_metadata/third_party:six.BUILD"
 )
 
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "930c2c3b5ecc6c9c12615cf5ad93f1cd6e12d0aba862b572e076259970ac3a53",
-    strip_prefix = "protobuf-3.21.12",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.21.12.tar.gz"],
-)
+# http_archive(
+#     name = "com_google_protobuf",
+#     sha256 = "930c2c3b5ecc6c9c12615cf5ad93f1cd6e12d0aba862b572e076259970ac3a53",
+#     strip_prefix = "protobuf-3.21.12",
+#     urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.21.12.tar.gz"],
+# )
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+# load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
-protobuf_deps()
+# protobuf_deps()
 
-# Needed by Protobuf.
-http_archive(
-    name = "zlib",
-    build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
-    sha256 = "d8688496ea40fb61787500e863cc63c9afcbc524468cedeb478068924eb54932",
-    strip_prefix = "zlib-1.2.12",
-    urls = ["https://github.com/madler/zlib/archive/v1.2.12.tar.gz"],
-)
+# # Needed by Protobuf.
+# http_archive(
+#     name = "zlib",
+#     build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
+#     sha256 = "d8688496ea40fb61787500e863cc63c9afcbc524468cedeb478068924eb54932",
+#     strip_prefix = "zlib-1.2.12",
+#     urls = ["https://github.com/madler/zlib/archive/v1.2.12.tar.gz"],
+# )
 
 http_archive(
     name = "pybind11_bazel",
@@ -156,21 +223,37 @@ bind(
 #        @com_google_re2 for consistency with dependency grpc
 #        which uses @com_github_google_re2.
 #          (see https://github.com/google/xls/issues/234)
-http_archive(
-    name = "com_googlesource_code_re2",
-    sha256 = "ef516fb84824a597c4d5d0d6d330daedb18363b5a99eda87d027e6bdd9cba299",
-    strip_prefix = "re2-03da4fc0857c285e3a26782f6bc8931c4c950df4",
-    urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/re2/archive/03da4fc0857c285e3a26782f6bc8931c4c950df4.tar.gz",
-        "https://github.com/google/re2/archive/03da4fc0857c285e3a26782f6bc8931c4c950df4.tar.gz",
-    ],
-)
+# http_archive(
+#     name = "com_googlesource_code_re2",
+#     sha256 = "ef516fb84824a597c4d5d0d6d330daedb18363b5a99eda87d027e6bdd9cba299",
+#     strip_prefix = "re2-03da4fc0857c285e3a26782f6bc8931c4c950df4",
+#     urls = [
+#         "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/re2/archive/03da4fc0857c285e3a26782f6bc8931c4c950df4.tar.gz",
+#         "https://github.com/google/re2/archive/03da4fc0857c285e3a26782f6bc8931c4c950df4.tar.gz",
+#     ],
+# )
 
 http_archive(
+    name = "com_googlesource_code_re2",
+    urls = [
+        "https://github.com/google/re2/archive/d1394506654e0a19a92f3d8921e26f7c3f4de969.tar.gz",
+    ],
+    sha256 = "ac855fb93dfa6878f88bc1c399b9a2743fdfcb3dc24b94ea9a568a1c990b1212",
+    strip_prefix = "re2-d1394506654e0a19a92f3d8921e26f7c3f4de969",
+)
+
+# http_archive(
+#     name = "com_github_grpc_grpc",
+#     urls = ["https://github.com/grpc/grpc/archive/v1.46.3.tar.gz"],
+#     sha256 = "d6cbf22cb5007af71b61c6be316a79397469c58c82a942552a62e708bce60964",
+#     strip_prefix = "grpc-1.46.3",
+# )
+# gRPC. Official release 1.50.0. Name is required by Google APIs.
+http_archive(
     name = "com_github_grpc_grpc",
-    urls = ["https://github.com/grpc/grpc/archive/v1.46.3.tar.gz"],
-    sha256 = "d6cbf22cb5007af71b61c6be316a79397469c58c82a942552a62e708bce60964",
-    strip_prefix = "grpc-1.46.3",
+    sha256 = "76900ab068da86378395a8e125b5cc43dfae671e09ff6462ddfef18676e2165a",
+    strip_prefix = "grpc-1.50.0",
+    urls = ["https://github.com/grpc/grpc/archive/v1.50.0.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -191,33 +274,34 @@ bind(
     actual = "@com_github_grpc_grpc//:grpc++",
 )
 
+# pulled in transitively by gRPC.
 # Needed by gRPC.
-http_archive(
-    name = "build_bazel_rules_swift",
-    sha256 = "d0833bc6dad817a367936a5f902a0c11318160b5e80a20ece35fb85a5675c886",
-    strip_prefix = "rules_swift-3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8",
-    urls = ["https://github.com/bazelbuild/rules_swift/archive/3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8.tar.gz"],
-)
+# http_archive(
+#     name = "build_bazel_rules_swift",
+#     sha256 = "d0833bc6dad817a367936a5f902a0c11318160b5e80a20ece35fb85a5675c886",
+#     strip_prefix = "rules_swift-3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8",
+#     urls = ["https://github.com/bazelbuild/rules_swift/archive/3eeeb53cebda55b349d64c9fc144e18c5f7c0eb8.tar.gz"],
+# )
 
-http_archive(
-    name = "io_bazel_rules_go",
-    urls = [
-        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz",
-        "https://github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz",
-    ],
-    sha256 = "e88471aea3a3a4f19ec1310a55ba94772d087e9ce46e41ae38ecebe17935de7b",
-)
+# http_archive(
+#     name = "io_bazel_rules_go",
+#     urls = [
+#         "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz",
+#         "https://github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz",
+#     ],
+#     sha256 = "e88471aea3a3a4f19ec1310a55ba94772d087e9ce46e41ae38ecebe17935de7b",
+# )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchains")
 
-http_archive(
-    name = "bazel_gazelle",
-    urls = [
-        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.1/bazel-gazelle-v0.19.1.tar.gz",
-        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.1/bazel-gazelle-v0.19.1.tar.gz",
-    ],
-    sha256 = "86c6d481b3f7aedc1d60c1c211c6f76da282ae197c3b3160f54bd3a8f847896f",
-)
+# http_archive(
+#     name = "bazel_gazelle",
+#     urls = [
+#         "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.1/bazel-gazelle-v0.19.1.tar.gz",
+#         "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.19.1/bazel-gazelle-v0.19.1.tar.gz",
+#     ],
+#     sha256 = "86c6d481b3f7aedc1d60c1c211c6f76da282ae197c3b3160f54bd3a8f847896f",
+# )
 
 load("@bazel_gazelle//:deps.bzl", "go_repository", "gazelle_dependencies")
 
@@ -267,6 +351,10 @@ zetasql_deps_step_2(  # windows
     tools_deps = False,  # windows
     java_deps = False,  # windows
     testing_deps = False)  # windows
+load("@com_google_zetasql//bazel:zetasql_deps_step_3.bzl", "zetasql_deps_step_3")
+zetasql_deps_step_3()
+load("@com_google_zetasql//bazel:zetasql_deps_step_4.bzl", "zetasql_deps_step_4")
+zetasql_deps_step_4()
 
 # This is part of what zetasql_deps_step_3() does.
 load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
