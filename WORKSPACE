@@ -50,13 +50,6 @@ http_archive(
     patches = ["//ml_metadata/third_party:rules_foreign_cc.patch",],
 )
 
-# # https://github.com/bazelbuild/rules_foreign_cc/issues/1051
-# RULES_FOREIGN_CC_VERSION = "0.8.0"
-# http_archive(
-#     name = "rules_foreign_cc",
-#     strip_prefix = "rules_foreign_cc-%s" % RULES_FOREIGN_CC_VERSION,
-#     url = "https://github.com/bazelbuild/rules_foreign_cc/archive/refs/tags/%s.tar.gz" % RULES_FOREIGN_CC_VERSION,
-# )
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 rules_foreign_cc_dependencies()
 
