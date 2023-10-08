@@ -36,10 +36,10 @@ http_archive(
     ],
 )
 
-# # Install version 0.9.0 of rules_foreign_cc, as default version causes an
-# # invalid escape sequence error to be raised, which can't be avoided with
-# # the --incompatible_restrict_string_escapes=false flag (flag was removed in
-# # Bazel 5.0).
+# Install version 0.9.0 of rules_foreign_cc, as default version causes an
+# invalid escape sequence error to be raised, which can't be avoided with
+# the --incompatible_restrict_string_escapes=false flag (flag was removed in
+# Bazel 5.0).
 RULES_FOREIGN_CC_VERSION = "0.9.0"
 http_archive(
     name = "rules_foreign_cc",
@@ -59,17 +59,6 @@ http_archive(
 # )
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 rules_foreign_cc_dependencies()
-
-# RULES_FOREIGN_CC_COMMIT = "a7f9e8b38cc2c8a7c66862dd6a4c8848e9829a02" # 23/09/2022
-# http_archive(
-#     name="rules_foreign_cc",
-#     sha256 = "ce3121834693d76308f50fa62c548c2710f900d807beb11d97c25739b6995f58",
-#     strip_prefix = "rules_foreign_cc-%s" % RULES_FOREIGN_CC_COMMIT,
-#     urls = [
-#         "https://mirror.bazel.build/github.com/bazelbuild/rules_foreign_cc/archive/%s.tar.gz" % RULES_FOREIGN_CC_COMMIT,
-#         "https://github.com/bazelbuild/rules_foreign_cc/archive/%s.tar.gz" % RULES_FOREIGN_CC_COMMIT,
-#     ],
-# )
 
 # # lts_20220623.1
 # ABSL_COMMIT = "8c0b94e793a66495e0b1f34a5eb26bd7dc672db0" # https://github.com/abseil/abseil-cpp/archive/fb3621f4f897824c0dbe0615fa94543df6192f30.tar.gz
