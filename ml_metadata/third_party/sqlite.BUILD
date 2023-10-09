@@ -6,14 +6,14 @@ licenses(["unencumbered"])  # Public Domain
 config_setting(
     name = "windows",
     constraint_values = [
-        "@bazel_tools//platforms:windows",
+        "@platforms//os:windows",
     ],
 )
 
 config_setting(
     name = "macos",
     constraint_values = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
     ],
 )
 
